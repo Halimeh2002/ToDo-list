@@ -1,17 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 
-const TodoList = ({ language, texts, selectedDate, showProgress = false }) => {
-  const [todos, setTodos] = useState({});
+const TodoList = ({
+  language,
+  texts,
+  selectedDate,
+  showProgress = false,
+  todos,
+  setTodos,
+}) => {
   const [input, setInput] = useState("");
-
-  useEffect(() => {
-    const savedTodos = JSON.parse(localStorage.getItem("todos")) || {};
-    setTodos(savedTodos);
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem("todos", JSON.stringify(todos));
-  }, [todos]);
 
   const addTodo = () => {
     if (input.trim()) {
@@ -25,6 +22,12 @@ const TodoList = ({ language, texts, selectedDate, showProgress = false }) => {
       };
       setTodos(newTodos);
       setInput("");
+    }
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      addTodo();
     }
   };
 
@@ -47,13 +50,13 @@ const TodoList = ({ language, texts, selectedDate, showProgress = false }) => {
   };
 
   const currentTodos = todos[selectedDate] || [];
-  const completedCount = currentTodos.filter((todo) => todo.completed).length;
   const totalCount = currentTodos.length;
+  const completedCount = currentTodos.filter((todo) => todo.completed).length;
   const progress = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
 
   if (showProgress) {
     return (
-      <div className="progress">
+      <div className="progress position-relative">
         <div
           className="progress-bar bg-success"
           role="progressbar"
@@ -62,8 +65,20 @@ const TodoList = ({ language, texts, selectedDate, showProgress = false }) => {
           aria-valuemin="0"
           aria-valuemax="100"
         >
-          {Math.round(progress)}%
+          {progress > 0 && (
+            <span
+              className="position-absolute"
+              style={{
+                right: "5px",
+                top: "50%",
+                transform: "translateY(-50%)",
+              }}
+            >
+              ✅
+            </span>
+          )}
         </div>
+        <span className="progress-text">{Math.round(progress)}%</span>
       </div>
     );
   }
@@ -77,6 +92,7 @@ const TodoList = ({ language, texts, selectedDate, showProgress = false }) => {
           placeholder={texts[language].placeholder}
           value={input}
           onChange={(e) => setInput(e.target.value)}
+          onKeyPress={handleKeyPress}
         />
         <button className="btn btn-soft-success" onClick={addTodo}>
           {texts[language].add}

@@ -10,6 +10,7 @@ const App = () => {
     new Date().toISOString().split("T")[0]
   );
   const [music, setMusic] = useState(null);
+  const [todos, setTodos] = useState({});
 
   const backgrounds = [
     "/assets/images/bg1.jpg",
@@ -57,6 +58,15 @@ const App = () => {
   };
 
   useEffect(() => {
+    const savedTodos = JSON.parse(localStorage.getItem("todos")) || {};
+    setTodos(savedTodos);
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("todos", JSON.stringify(todos));
+  }, [todos]);
+
+  useEffect(() => {
     const interval = setInterval(() => {
       setBackgroundIndex((prev) => (prev + 1) % backgrounds.length);
     }, 5 * 60 * 1000); // ۵ دقیقه
@@ -69,7 +79,7 @@ const App = () => {
 
   return (
     <div
-      className={`container-fluid p-4 theme-${theme}`}
+      className={`container-fluid p-3 theme-${theme}`}
       style={{
         backgroundImage: `url(${backgrounds[backgroundIndex]})`,
         backgroundSize: "cover",
@@ -81,11 +91,8 @@ const App = () => {
       dir={language === "fa" ? "rtl" : "ltr"}
     >
       <div className="row">
-        {/* نوار پیشرفت و تقویم در سمت چپ */}
-        <div
-          className="col-md-2 position-fixed top-0 start-0 p-3"
-          style={{ zIndex: 1000 }}
-        >
+        {/* نوار پیشرفت، تقویم، تم و موسیقی در سمت چپ */}
+        <div className="col-12 col-md-2 sidebar">
           <button
             className="btn btn-outline-primary w-100 mb-3"
             onClick={toggleLanguage}
@@ -99,10 +106,10 @@ const App = () => {
               texts={texts}
               selectedDate={selectedDate}
               showProgress
+              todos={todos}
             />
           </div>
-          {/* تقویم زیر نوار پیشرفت */}
-          <div className="card p-3 shadow-sm position-fixed bottom-0 start-0 p-3">
+          <div className="card p-3 shadow-sm mb-3">
             <h5 className="text-center">{texts[language].calendarLabel}</h5>
             <input
               type="date"
@@ -111,52 +118,51 @@ const App = () => {
               onChange={(e) => setSelectedDate(e.target.value)}
             />
           </div>
+          <div className="card p-3 shadow-sm">
+            <label className="form-label">{texts[language].themeLabel}</label>
+            <select
+              className="form-select mb-2"
+              value={theme}
+              onChange={changeTheme}
+            >
+              <option value="light">
+                {language === "fa" ? "روشن" : "Light"}
+              </option>
+              <option value="dark">
+                {language === "fa" ? "تیره" : "Dark"}
+              </option>
+              <option value="calm">
+                {language === "fa" ? "آرامش‌بخش" : "Calm"}
+              </option>
+            </select>
+            <label className="form-label">{texts[language].musicLabel}</label>
+            <select
+              className="form-select"
+              value={music || ""}
+              onChange={changeMusic}
+            >
+              <option value="">
+                {language === "fa" ? "بدون موسیقی" : "No Music"}
+              </option>
+              {musicList.map((track, index) => (
+                <option key={index} value={track.url}>
+                  {language === "fa" ? track.name : `Calm ${index + 1}`}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
         {/* بخش اصلی */}
-        <div className="col-md-8 offset-md-2">
+        <div className="col-12 col-md-9 offset-md-2 main-content">
           <h1 className="text-center mb-4">{texts[language].title}</h1>
-
-          {language === "en" && (
-            <div className="row mb-4">
-              <div className="col-md-6">
-                <label className="form-label">
-                  {texts[language].themeLabel}
-                </label>
-                <select
-                  className="form-select"
-                  value={theme}
-                  onChange={changeTheme}
-                >
-                  <option value="light">Light</option>
-                  <option value="dark">Dark</option>
-                  <option value="calm">Calm</option>
-                </select>
-              </div>
-              <div className="col-md-6">
-                <label className="form-label">
-                  {texts[language].musicLabel}
-                </label>
-                <select
-                  className="form-select"
-                  value={music || ""}
-                  onChange={changeMusic}
-                >
-                  <option value="">No Music</option>
-                  {musicList.map((track, index) => (
-                    <option key={index} value={track.url}>
-                      {language === "fa" ? track.name : `Calm ${index + 1}`}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-          )}
 
           <TodoList
             language={language}
             texts={texts}
             selectedDate={selectedDate}
+            todos={todos}
+            setTodos={setTodos}
           />
           {music && <audio src={music} autoPlay loop />}
         </div>

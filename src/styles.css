@@ -121,15 +121,92 @@ body {
 .progress {
   height: 20px;
   border-radius: 10px;
+  position: relative;
 }
 
-.position-fixed {
-  height: auto; /* تغییر به auto تا فقط محتوای خودش رو بگیره */
-  overflow-y: auto;
+.progress-text {
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  color: #000;
+  font-weight: bold;
 }
 
-/* تنظیم تقویم پایین سمت چپ */
-.position-fixed.bottom-0 {
-  top: auto;
-  bottom: 0;
+/* تنظیمات ستون‌ها */
+.sidebar {
+  width: 200px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+}
+
+.main-content {
+  margin-left: 210px;
+  padding: 0 10px;
+}
+
+/* تنظیم فاصله‌ها در ستون سمت چپ */
+.sidebar .card {
+  margin-bottom: 15px;
+}
+
+/* ریسپانسیو برای موبایل */
+@media (max-width: 768px) {
+  .sidebar {
+    position: static; /* حذف position-fixed در موبایل */
+    width: 100%;
+    margin-bottom: 20px;
+  }
+
+  .main-content {
+    margin-left: 0; /* حذف فاصله در موبایل */
+    padding: 0 10px;
+  }
+
+  .container-fluid {
+    padding: 10px;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  .card {
+    padding: 10px;
+  }
+
+  .btn {
+    font-size: 0.9rem;
+  }
+
+  .form-select,
+  .form-control {
+    font-size: 0.9rem;
+  }
+
+  /* تنظیم چیدمان عمودی */
+  .row {
+    flex-direction: column;
+  }
+
+  .sidebar,
+  .main-content {
+    width: 100%;
+  }
+}
+
+/* ریسپانسیو برای تبلت */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .sidebar {
+    width: 180px;
+  }
+
+  .main-content {
+    margin-left: 190px;
+  }
+
+  h1 {
+    font-size: 1.8rem;
+  }
 }
