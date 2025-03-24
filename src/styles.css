@@ -1,0 +1,135 @@
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #f0f2f5;
+}
+
+.container-fluid {
+  max-width: 1400px;
+  margin: 0 auto;
+  border-radius: 15px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+/* تم روشن */
+.theme-light {
+  background-color: rgba(248, 249, 250, 0.9);
+  color: #212529;
+}
+
+.theme-light .card {
+  background-color: rgba(255, 255, 255, 0.7);
+}
+
+.theme-light .btn-soft-success {
+  background-color: #80bdff;
+  color: #fff;
+}
+
+.theme-light .btn-soft-success:hover {
+  background-color: #66a6ff;
+}
+
+.theme-light .btn-soft-danger {
+  background-color: #80bdff;
+  color: #fff;
+}
+
+.theme-light .btn-soft-danger:hover {
+  background-color: #66a6ff;
+}
+
+/* تم تیره */
+.theme-dark {
+  background-color: rgba(52, 58, 64, 0.9);
+  color: #f8f9fa;
+}
+
+.theme-dark .card {
+  background-color: rgba(80, 80, 80, 0.7);
+}
+
+.theme-dark .btn-soft-success {
+  background-color: #ff6f61;
+  color: #fff;
+}
+
+.theme-dark .btn-soft-success:hover {
+  background-color: #ff5544;
+}
+
+.theme-dark .btn-soft-danger {
+  background-color: #ff6f61;
+  color: #fff;
+}
+
+.theme-dark .btn-soft-danger:hover {
+  background-color: #ff5544;
+}
+
+/* تم آرامش‌بخش */
+.theme-calm {
+  background-color: rgba(230, 243, 247, 0.9);
+  color: #2c3e50;
+}
+
+.theme-calm .card {
+  background-color: rgba(255, 255, 255, 0.7);
+}
+
+.theme-calm .btn-soft-success {
+  background-color: #a3d9c9;
+  color: #fff;
+}
+
+.theme-calm .btn-soft-success:hover {
+  background-color: #8cccb6;
+}
+
+.theme-calm .btn-soft-danger {
+  background-color: #a3d9c9;
+  color: #fff;
+}
+
+.theme-calm .btn-soft-danger:hover {
+  background-color: #8cccb6;
+}
+
+/* استایل‌های عمومی */
+.btn-soft-success {
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.btn-soft-danger {
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.list-group-item {
+  border-radius: 10px;
+  margin-bottom: 5px;
+  background-color: rgba(255, 255, 255, 0.8);
+}
+
+.card {
+  border: none;
+  border-radius: 15px;
+}
+
+.progress {
+  height: 20px;
+  border-radius: 10px;
+}
+
+.position-fixed {
+  height: auto; /* تغییر به auto تا فقط محتوای خودش رو بگیره */
+  overflow-y: auto;
+}
+
+/* تنظیم تقویم پایین سمت چپ */
+.position-fixed.bottom-0 {
+  top: auto;
+  bottom: 0;
+}
