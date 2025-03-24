@@ -136,13 +136,13 @@ body {
 .sidebar {
   width: 200px;
   position: fixed;
-  top: 0;
-  left: 0;
+  top: 50px; /* فاصله از بالای صفحه */
+  left: 20px;
   z-index: 1000;
 }
 
 .main-content {
-  margin-left: 210px;
+  margin-left: 230px;
   padding: 0 10px;
 }
 
@@ -154,13 +154,15 @@ body {
 /* ریسپانسیو برای موبایل */
 @media (max-width: 768px) {
   .sidebar {
-    position: static; /* حذف position-fixed در موبایل */
+    position: static;
     width: 100%;
     margin-bottom: 20px;
+    left: 0;
+    top: 0; /* حذف فاصله از بالا در موبایل */
   }
 
   .main-content {
-    margin-left: 0; /* حذف فاصله در موبایل */
+    margin-left: 0;
     padding: 0 10px;
   }
 
@@ -185,7 +187,6 @@ body {
     font-size: 0.9rem;
   }
 
-  /* تنظیم چیدمان عمودی */
   .row {
     flex-direction: column;
   }
@@ -200,10 +201,12 @@ body {
 @media (min-width: 769px) and (max-width: 1024px) {
   .sidebar {
     width: 180px;
+    left: 15px;
+    top: 40px; /* فاصله کمتر از بالا در تبلت */
   }
 
   .main-content {
-    margin-left: 190px;
+    margin-left: 200px;
   }
 
   h1 {
