@@ -9,7 +9,8 @@
     "express": "^4.21.2",
     "mysql2": "^3.14.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-toastify": "^11.0.5"
   },
   "scripts": {
     "start": "react-scripts start",

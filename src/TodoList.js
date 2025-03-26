@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const TodoList = ({
   language,
@@ -9,20 +11,32 @@ const TodoList = ({
   setTodos,
 }) => {
   const [input, setInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const addTodo = () => {
-    if (input.trim()) {
-      const dateTodos = todos[selectedDate] || [];
-      const newTodos = {
-        ...todos,
-        [selectedDate]: [
-          ...dateTodos,
-          { id: Date.now(), text: input, completed: false },
-        ],
-      };
-      setTodos(newTodos);
-      setInput("");
-    }
+    if (!input.trim()) return;
+    setIsLoading(true);
+    axios
+      .post("http://localhost:5000/todos", {
+        text: input,
+        date: selectedDate,
+      })
+      .then((response) => {
+        setTodos([...todos, response.data]);
+        setInput("");
+        toast.success(
+          language === "fa"
+            ? "وظیفه با موفقیت اضافه شد"
+            : "Task added successfully"
+        );
+      })
+      .catch((error) => {
+        console.error("Error adding todo:", error);
+        toast.error(
+          language === "fa" ? "خطا در اضافه کردن وظیفه" : "Error adding todo"
+        );
+      })
+      .finally(() => setIsLoading(false));
   };
 
   const handleKeyPress = (e) => {
@@ -31,27 +45,52 @@ const TodoList = ({
     }
   };
 
+  const toggleTodo = (id, completed) => {
+    setIsLoading(true);
+    axios
+      .put(`http://localhost:5000/todos/${id}`, { completed: !completed })
+      .then(() => {
+        setTodos(
+          todos.map((todo) =>
+            todo.id === id ? { ...todo, completed: !completed } : todo
+          )
+        );
+        toast.success(
+          language === "fa" ? "وضعیت وظیفه تغییر کرد" : "Task status updated"
+        );
+      })
+      .catch((error) => {
+        console.error("Error updating todo:", error);
+        toast.error(
+          language === "fa" ? "خطا در تغییر وضعیت" : "Error updating todo"
+        );
+      })
+      .finally(() => setIsLoading(false));
+  };
+
   const deleteTodo = (id) => {
-    const dateTodos = todos[selectedDate].filter((todo) => todo.id !== id);
-    setTodos({
-      ...todos,
-      [selectedDate]: dateTodos,
-    });
+    setIsLoading(true);
+    axios
+      .delete(`http://localhost:5000/todos/${id}`)
+      .then(() => {
+        setTodos(todos.filter((todo) => todo.id !== id));
+        toast.success(
+          language === "fa"
+            ? "وظیفه با موفقیت حذف شد"
+            : "Task deleted successfully"
+        );
+      })
+      .catch((error) => {
+        console.error("Error deleting todo:", error);
+        toast.error(
+          language === "fa" ? "خطا در حذف وظیفه" : "Error deleting todo"
+        );
+      })
+      .finally(() => setIsLoading(false));
   };
 
-  const toggleTodo = (id) => {
-    const dateTodos = todos[selectedDate].map((todo) =>
-      todo.id === id ? { ...todo, completed: !todo.completed } : todo
-    );
-    setTodos({
-      ...todos,
-      [selectedDate]: dateTodos,
-    });
-  };
-
-  const currentTodos = todos[selectedDate] || [];
-  const totalCount = currentTodos.length;
-  const completedCount = currentTodos.filter((todo) => todo.completed).length;
+  const totalCount = todos.length;
+  const completedCount = todos.filter((todo) => todo.completed).length;
   const progress = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
 
   if (showProgress) {
@@ -93,14 +132,23 @@ const TodoList = ({
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyPress={handleKeyPress}
+          disabled={isLoading}
         />
-        <button className="btn btn-soft-success" onClick={addTodo}>
-          {texts[language].add}
+        <button
+          className="btn btn-soft-success"
+          onClick={addTodo}
+          disabled={isLoading}
+        >
+          {isLoading
+            ? language === "fa"
+              ? "در حال بارگذاری..."
+              : "Loading..."
+            : texts[language].add}
         </button>
       </div>
 
       <ul className="list-group">
-        {currentTodos.map((todo) => (
+        {todos.map((todo) => (
           <li
             key={todo.id}
             className={`list-group-item d-flex justify-content-between align-items-center ${
@@ -113,7 +161,8 @@ const TodoList = ({
                 className={`btn btn-sm me-2 ${
                   todo.completed ? "btn-success" : "btn-outline-success"
                 }`}
-                onClick={() => toggleTodo(todo.id)}
+                onClick={() => toggleTodo(todo.id, todo.completed)}
+                disabled={isLoading}
               >
                 {language === "fa"
                   ? todo.completed
@@ -126,6 +175,7 @@ const TodoList = ({
               <button
                 className="btn btn-soft-danger btn-sm"
                 onClick={() => deleteTodo(todo.id)}
+                disabled={isLoading}
               >
                 {language === "fa" ? "حذف" : "Delete"}
               </button>

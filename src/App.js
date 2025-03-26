@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
 import TodoList from "./TodoList";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import axios from "axios";
 import "./styles.css";
 
 const App = () => {
@@ -10,7 +13,7 @@ const App = () => {
     new Date().toISOString().split("T")[0]
   );
   const [music, setMusic] = useState(null);
-  const [todos, setTodos] = useState({});
+  const [todos, setTodos] = useState([]);
 
   const backgrounds = [
     "/assets/images/bg1.jpg",
@@ -36,7 +39,7 @@ const App = () => {
 
   const texts = {
     fa: {
-      title: "لیست وظایف استاد",
+      title: "لیست وظایف",
       add: "اضافه کردن",
       placeholder: "وظیفه جدید...",
       langButton: "تغییر به انگلیسی",
@@ -57,14 +60,19 @@ const App = () => {
     },
   };
 
+  // دریافت وظایف از بک‌اند
   useEffect(() => {
-    const savedTodos = JSON.parse(localStorage.getItem("todos")) || {};
-    setTodos(savedTodos);
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem("todos", JSON.stringify(todos));
-  }, [todos]);
+    if (selectedDate) {
+      axios
+        .get(`http://localhost:5000/todos/${selectedDate}`)
+        .then((response) => {
+          setTodos(response.data);
+        })
+        .catch((error) => {
+          console.error("Error fetching todos:", error);
+        });
+    }
+  }, [selectedDate]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -156,7 +164,6 @@ const App = () => {
         {/* بخش اصلی */}
         <div className="col-12 col-md-9 offset-md-2 main-content">
           <h1 className="text-center mb-4">{texts[language].title}</h1>
-
           <TodoList
             language={language}
             texts={texts}
@@ -167,6 +174,7 @@ const App = () => {
           {music && <audio src={music} autoPlay loop />}
         </div>
       </div>
+      <ToastContainer />
     </div>
   );
 };
