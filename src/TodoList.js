@@ -95,29 +95,38 @@ const TodoList = ({
 
   if (showProgress) {
     return (
-      <div className="progress position-relative">
-        <div
-          className="progress-bar bg-success"
-          role="progressbar"
-          style={{ width: `${progress}%` }}
-          aria-valuenow={progress}
-          aria-valuemin="0"
-          aria-valuemax="100"
-        >
-          {progress > 0 && (
-            <span
-              className="position-absolute"
-              style={{
-                right: "5px",
-                top: "50%",
-                transform: "translateY(-50%)",
-              }}
-            >
-              ✅
-            </span>
-          )}
+      <div>
+        <div className="progress position-relative">
+          <div
+            className="progress-bar bg-success"
+            role="progressbar"
+            style={{ width: `${progress}%` }}
+            aria-valuenow={progress}
+            aria-valuemin="0"
+            aria-valuemax="100"
+          >
+            {progress > 0 && (
+              <span
+                className="position-absolute"
+                style={{
+                  right: "5px",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                }}
+              >
+                ✅
+              </span>
+            )}
+          </div>
+          <span className="progress-text">{Math.round(progress)}%</span>
         </div>
-        <span className="progress-text">{Math.round(progress)}%</span>
+        <div className="text-center mt-2">
+          <small>
+            {language === "fa"
+              ? `${completedCount} از ${totalCount} وظیفه تکمیل شده`
+              : `${completedCount} of ${totalCount} tasks completed`}
+          </small>
+        </div>
       </div>
     );
   }
