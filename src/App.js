@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import TodoList from "./TodoList";
-import { ToastContainer } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import "./styles.css";
@@ -14,6 +14,13 @@ const App = () => {
   );
   const [music, setMusic] = useState(null);
   const [todos, setTodos] = useState([]);
+  const [token, setToken] = useState(localStorage.getItem("token") || null);
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    !!localStorage.getItem("token")
+  );
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [isRegistering, setIsRegistering] = useState(false);
 
   const backgrounds = [
     "/assets/images/bg1.jpg",
@@ -47,6 +54,13 @@ const App = () => {
       musicLabel: "موسیقی بی‌کلام:",
       calendarLabel: "تقویم",
       progressLabel: "پیشرفت امروز",
+      login: "ورود",
+      register: "ثبت‌نام",
+      logout: "خروج",
+      username: "نام کاربری",
+      password: "رمز عبور",
+      switchToLogin: "حساب دارید؟ وارد شوید",
+      switchToRegister: "حساب ندارید؟ ثبت‌نام کنید",
     },
     en: {
       title: "Professor Todo List",
@@ -57,22 +71,34 @@ const App = () => {
       musicLabel: "Background Music:",
       calendarLabel: "Calendar",
       progressLabel: "Today’s Progress",
+      login: "Login",
+      register: "Register",
+      logout: "Logout",
+      username: "Username",
+      password: "Password",
+      switchToLogin: "Have an account? Login",
+      switchToRegister: "Don't have an account? Register",
     },
   };
 
   // دریافت وظایف از بک‌اند
   useEffect(() => {
-    if (selectedDate) {
+    if (isAuthenticated && selectedDate) {
       axios
-        .get(`http://localhost:5000/todos/${selectedDate}`)
+        .get(`http://localhost:5000/todos/${selectedDate}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
         .then((response) => {
           setTodos(response.data);
         })
         .catch((error) => {
           console.error("Error fetching todos:", error);
+          toast.error(
+            language === "fa" ? "خطا در دریافت وظایف" : "Error fetching todos"
+          );
         });
     }
-  }, [selectedDate]);
+  }, [selectedDate, isAuthenticated, token, language]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -84,6 +110,115 @@ const App = () => {
   const toggleLanguage = () => setLanguage(language === "fa" ? "en" : "fa");
   const changeTheme = (e) => setTheme(e.target.value);
   const changeMusic = (e) => setMusic(e.target.value);
+
+  const handleAuth = () => {
+    const endpoint = isRegistering ? "/register" : "/login";
+    axios
+      .post(`http://localhost:5000${endpoint}`, { username, password })
+      .then((response) => {
+        if (isRegistering) {
+          toast.success(
+            language === "fa"
+              ? "ثبت‌نام با موفقیت انجام شد"
+              : "Registration successful"
+          );
+          setIsRegistering(false);
+        } else {
+          const { token } = response.data;
+          localStorage.setItem("token", token);
+          setToken(token);
+          setIsAuthenticated(true);
+          toast.success(
+            language === "fa" ? "ورود با موفقیت انجام شد" : "Login successful"
+          );
+        }
+      })
+      .catch((error) => {
+        console.error(
+          `Error during ${isRegistering ? "registration" : "login"}:`,
+          error
+        );
+        toast.error(
+          language === "fa"
+            ? "خطا در " + (isRegistering ? "ثبت‌نام" : "ورود")
+            : `Error during ${isRegistering ? "registration" : "login"}`
+        );
+      });
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setToken(null);
+    setIsAuthenticated(false);
+    setTodos([]);
+    toast.success(
+      language === "fa" ? "با موفقیت خارج شدید" : "Logout successful"
+    );
+  };
+
+  if (!isAuthenticated) {
+    return (
+      <div
+        className={`container-fluid p-3 theme-${theme}`}
+        style={{
+          backgroundImage: `url(${backgrounds[backgroundIndex]})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          minHeight: "100vh",
+          fontFamily:
+            language === "fa" ? "'Vazir', sans-serif" : "'Roboto', sans-serif",
+        }}
+        dir={language === "fa" ? "rtl" : "ltr"}
+      >
+        <div className="row justify-content-center">
+          <div className="col-12 col-md-4">
+            <div className="card p-4 shadow-sm">
+              <h3 className="text-center mb-4">
+                {isRegistering
+                  ? texts[language].register
+                  : texts[language].login}
+              </h3>
+              <div className="mb-3">
+                <label className="form-label">{texts[language].username}</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                />
+              </div>
+              <div className="mb-3">
+                <label className="form-label">{texts[language].password}</label>
+                <input
+                  type="password"
+                  className="form-control"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
+              <button
+                className="btn btn-primary w-100 mb-3"
+                onClick={handleAuth}
+              >
+                {isRegistering
+                  ? texts[language].register
+                  : texts[language].login}
+              </button>
+              <button
+                className="btn btn-link w-100"
+                onClick={() => setIsRegistering(!isRegistering)}
+              >
+                {isRegistering
+                  ? texts[language].switchToLogin
+                  : texts[language].switchToRegister}
+              </button>
+            </div>
+          </div>
+        </div>
+        <ToastContainer />
+      </div>
+    );
+  }
 
   return (
     <div
@@ -106,6 +241,12 @@ const App = () => {
             onClick={toggleLanguage}
           >
             {texts[language].langButton}
+          </button>
+          <button
+            className="btn btn-outline-danger w-100 mb-3"
+            onClick={handleLogout}
+          >
+            {texts[language].logout}
           </button>
           <div className="card p-2 shadow-sm mb-3">
             <h6>{texts[language].progressLabel}</h6>
@@ -170,6 +311,7 @@ const App = () => {
             selectedDate={selectedDate}
             todos={todos}
             setTodos={setTodos}
+            token={token} // پاس دادن توکن به TodoList
           />
           {music && <audio src={music} autoPlay loop />}
         </div>
